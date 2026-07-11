@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOC Monitor — Security Operations Center</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #070b14;
+            --bg-secondary: #0d1321;
+            --bg-card: #111827;
+            --bg-card-hover: #1a2332;
+            --border: #1e293b;
+            --border-accent: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent: #06b6d4;
+            --accent-glow: rgba(6, 182, 212, 0.15);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --critical: #dc2626;
+            --high: #f97316;
+            --medium: #eab308;
+            --low: #3b82f6;
+            --sidebar-width: 240px;
+            --radius: 10px;
+            --shadow: 0 4px 24px rgba(0,0,0,0.4);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 8px 24px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent), #0891b2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .logo-text h2 { font-size: 15px; font-weight: 700; }
+        .logo-text span { font-size: 11px; color: var(--text-muted); }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.15s;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--accent-glow);
+            color: var(--accent);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .system-status-mini {
+            padding: 12px;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            font-size: 12px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        .status-dot.online { background: var(--success); box-shadow: 0 0 8px var(--success); }
+        .status-dot.warning { background: var(--warning); box-shadow: 0 0 8px var(--warning); }
+        .status-dot.offline { background: var(--danger); }
+
+        /* Main content */
+        .main {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(12px);
+        }
+
+        .topbar h1 { font-size: 20px; font-weight: 600; }
+        .topbar-meta { display: flex; align-items: center; gap: 16px; font-size: 13px; color: var(--text-muted); }
+
+        .refresh-btn {
+            background: transparent;
+            border: 1px solid var(--border-accent);
+            color: var(--text-secondary);
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.15s;
+        }
+
+        .refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+        .content { padding: 24px 32px; }
+
+        .section { display: none; }
+        .section.active { display: block; }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            transition: border-color 0.15s;
+        }
+
+        .kpi-card:hover { border-color: var(--border-accent); }
+
+        .kpi-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .kpi-value {
+            font-size: 32px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .kpi-value.critical { color: var(--critical); }
+        .kpi-value.high { color: var(--high); }
+        .kpi-value.medium { color: var(--medium); }
+        .kpi-value.accent { color: var(--accent); }
+
+        .kpi-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+        /* Charts */
+        .chart-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .panel-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        /* Tables */
+        .table-wrap { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th {
+            text-align: left;
+            padding: 10px 14px;
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        tr:hover td { background: var(--bg-card-hover); }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-critical { background: rgba(220,38,38,0.15); color: var(--critical); }
+        .badge-high { background: rgba(249,115,22,0.15); color: var(--high); }
+        .badge-medium { background: rgba(234,179,8,0.15); color: var(--medium); }
+        .badge-low { background: rgba(59,130,246,0.15); color: var(--low); }
+
+        .btn {
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            border: 1px solid var(--border-accent);
+            background: transparent;
+            color: var(--accent);
+            transition: all 0.15s;
+        }
+
+        .btn:hover { background: var(--accent); color: var(--bg-primary); }
+        .btn-ghost { color: var(--text-muted); border-color: transparent; }
+        .btn-ghost:hover { color: var(--text-primary); background: var(--bg-card-hover); }
+
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .filter-tab {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            background: transparent;
+            transition: all 0.15s;
+        }
+
+        .filter-tab.active, .filter-tab:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--accent-glow);
+        }
+
+        /* System panel */
+        .sys-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .sys-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+
+        .sys-item:last-child { border-bottom: none; }
+        .sys-label { color: var(--text-muted); }
+        .sys-value { color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+
+        .channel-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+        .channel-tag {
+            padding: 4px 10px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .channel-tag.ok { border-color: rgba(16,185,129,0.3); color: var(--success); }
+        .channel-tag.err { border-color: rgba(239,68,68,0.3); color: var(--danger); }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: var(--text-muted);
+        }
+
+        .empty-state .icon { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 200;
+        }
+
+        .toast {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-top: 8px;
+            font-size: 13px;
+            box-shadow: var(--shadow);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 150;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.open { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 560px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .modal h3 { margin-bottom: 16px; font-size: 18px; }
+        .modal-field { margin-bottom: 12px; font-size: 13px; }
+        .modal-field strong { color: var(--text-muted); display: block; margin-bottom: 4px; font-size: 11px; text-transform: uppercase; }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px;
+            color: var(--text-muted);
+            gap: 12px;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 1024px) {
+            .chart-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main { margin-left: 0; }
+            .content { padding: 16px; }
+            .topbar { padding: 12px 16px; }
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">🛡️</div>
+            <div class="logo-text">
+                <h2>SOC Monitor</h2>
+                <span>Threat Detection</span>
+            </div>
+        </div>
+        <nav>
+            <div class="nav-item active" data-section="overview">📊 Επισκόπηση</div>
+            <div class="nav-item" data-section="alerts">🚨 Ειδοποιήσεις</div>
+            <div class="nav-item" data-section="events">📋 Συμβάντα</div>
+            <div class="nav-item" data-section="system">⚙️ Σύστημα</div>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="system-status-mini">
+                <div><span class="status-dot online" id="connDot"></span><span id="connStatus">Σύνδεση...</span></div>
+                <div style="margin-top:6px;color:var(--text-muted)" id="sidebarUptime">Uptime: --</div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <h1 id="pageTitle">Επισκόπηση</h1>
+            <div class="topbar-meta">
+                <span id="lastUpdate">Τελευταία ενημέρωση: --</span>
+                <button class="refresh-btn" onclick="fetchAll()">↻ Ανανέωση</button>
+            </div>
+        </header>
+
+        <div class="content">
+            <!-- Overview -->
+            <section class="section active" id="sec-overview">
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Συμβάντα (24ω)</div>
+                        <div class="kpi-value accent" id="kpiEvents">--</div>
+                        <div class="kpi-sub" id="kpiEventsSub">Σύνολο στη βάση</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Critical Alerts</div>
+                        <div class="kpi-value critical" id="kpiCritical">--</div>
+                        <div class="kpi-sub">Απαιτούν άμεση δράση</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">High Alerts</div>
+                        <div class="kpi-value high" id="kpiHigh">--</div>
+                        <div class="kpi-sub">Υψηλής προτεραιότητας</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Failed Logins</div>
+                        <div class="kpi-value medium" id="kpiFailed">--</div>
+                        <div class="kpi-sub">Αποτυχημένες συνδέσεις</div>
+                    </div>
+                </div>
+
+                <div class="chart-grid">
+                    <div class="panel">
+                        <div class="panel-header"><span class="panel-title">Συμβάντα ανά ώρα (24ω)</span></div>
+                        <canvas id="eventsChart" height="80"></canvas>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header"><span class="panel-title">Κατανομή τύπων</span></div>
+                        <canvas id="typeChart" height="160"></canvas>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-title">Top Source IPs</span>
+                    </div>
+                    <div class="table-wrap" id="topIpsTable">
+                        <div class="empty-state"><div class="icon">🌐</div>Δεν υπάρχουν IP διευθύνσεις ακόμα</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Alerts -->
+            <section class="section" id="sec-alerts">
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-filter="all">Όλα</button>
+                    <button class="filter-tab" data-filter="unack">Μη αναγνωρισμένα</button>
+                    <button class="filter-tab" data-filter="critical">Critical</button>
+                    <button class="filter-tab" data-filter="high">High</button>
+                </div>
+                <div class="panel">
+                    <div class="table-wrap" id="alertsTable">
+                        <div class="loading"><div class="spinner"></div> Φόρτωση ειδοποιήσεων...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Events -->
+            <section class="section" id="sec-events">
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-title">Πρόσφατα συμβάντα</span>
+                        <select id="eventTypeFilter" style="background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);padding:4px 10px;border-radius:6px;font-size:12px;">
+                            <option value="">Όλοι οι τύποι</option>
+                        </select>
+                    </div>
+                    <div class="table-wrap" id="eventsTable">
+                        <div class="loading"><div class="spinner"></div> Φόρτωση συμβάντων...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- System -->
+            <section class="section" id="sec-system">
+                <div class="sys-grid">
+                    <div class="panel">
+                        <div class="panel-header"><span class="panel-title">Κατάσταση Συστήματος</span></div>
+                        <div id="sysInfo"><div class="loading"><div class="spinner"></div></div></div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header"><span class="panel-title">Log Collectors</span></div>
+                        <div id="collectorInfo"><div class="loading"><div class="spinner"></div></div></div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header"><span class="panel-title">Ειδοποιήσεις (Channels)</span></div>
+                        <div id="notifInfo"><div class="loading"><div class="spinner"></div></div></div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header"><span class="panel-title">API Endpoints</span></div>
+                        <div style="font-size:12px;color:var(--text-muted);line-height:2;">
+                            <div><code style="color:var(--accent)">GET /api/health</code> — Health check</div>
+                            <div><code style="color:var(--accent)">GET /api/stats</code> — Στατιστικά</div>
+                            <div><code style="color:var(--accent)">GET /api/alerts</code> — Ειδοποιήσεις</div>
+                            <div><code style="color:var(--accent)">GET /api/events/recent</code> — Συμβάντα</div>
+                            <div><code style="color:var(--accent)">GET /api/system/status</code> — Κατάσταση</div>
+                            <div><code style="color:var(--accent)">GET /docs</code> — Swagger UI</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="alertModal">
+        <div class="modal">
+            <h3>Λεπτομέρειες Ειδοποίησης</h3>
+            <div id="modalContent"></div>
+            <div style="margin-top:20px;text-align:right">
+                <button class="btn btn-ghost" onclick="closeModal()">Κλείσιμο</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toasts"></div>
+
+    <script>
+        let eventsChart, typeChart;
+        let allAlerts = [];
+        let alertFilter = 'all';
+        const SEVERITY = ['', 'LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
+        const SEVERITY_CLASS = ['', 'low', 'medium', 'high', 'critical'];
+
+        // Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                item.classList.add('active');
+                const sec = item.dataset.section;
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                document.getElementById('sec-' + sec).classList.add('active');
+                const titles = { overview: 'Επισκόπηση', alerts: 'Ειδοποιήσεις', events: 'Συμβάντα', system: 'Σύστημα' };
+                document.getElementById('pageTitle').textContent = titles[sec];
+            });
+        });
+
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                alertFilter = tab.dataset.filter;
+                renderAlerts();
+            });
+        });
+
+        document.getElementById('eventTypeFilter').addEventListener('change', () => fetchEvents());
+
+        function toast(msg) {
+            const el = document.createElement('div');
+            el.className = 'toast';
+            el.textContent = msg;
+            document.getElementById('toasts').appendChild(el);
+            setTimeout(() => el.remove(), 3000);
+        }
+
+        function formatTime(ts) {
+            return new Date(ts).toLocaleString('el-GR');
+        }
+
+        function truncate(str, len = 80) {
+            if (!str) return '-';
+            return str.length > len ? str.substring(0, len) + '…' : str;
+        }
+
+        async function fetchAll() {
+            try {
+                const [statsRes, alertsRes, eventsRes, sysRes] = await Promise.all([
+                    fetch('/api/stats?days=1'),
+                    fetch('/api/alerts?limit=50'),
+                    fetch('/api/events/recent?limit=30'),
+                    fetch('/api/system/status')
+                ]);
+
+                const stats = await statsRes.json();
+                const alerts = await alertsRes.json();
+                const events = await eventsRes.json();
+                const sys = await sysRes.json();
+
+                updateOverview(stats.data, sys.data);
+                allAlerts = alerts.data || [];
+                renderAlerts();
+                renderEvents(events.data || []);
+                renderSystem(sys.data || {});
+                populateEventTypes(stats.data.events_by_type || {});
+
+                document.getElementById('lastUpdate').textContent =
+                    'Τελευταία ενημέρωση: ' + new Date().toLocaleTimeString('el-GR');
+
+                document.getElementById('connDot').className = 'status-dot online';
+                document.getElementById('connStatus').textContent = 'Online';
+            } catch (e) {
+                document.getElementById('connDot').className = 'status-dot offline';
+                document.getElementById('connStatus').textContent = 'Αποσύνδεση';
+                console.error(e);
+            }
+        }
+
+        async function fetchEvents() {
+            const type = document.getElementById('eventTypeFilter').value;
+            const url = type ? `/api/events/recent?limit=30&event_type=${type}` : '/api/events/recent?limit=30';
+            const res = await fetch(url);
+            const data = await res.json();
+            renderEvents(data.data || []);
+        }
+
+        function updateOverview(stats, sys) {
+            document.getElementById('kpiEvents').textContent = (stats.total_events || 0).toLocaleString('el-GR');
+            document.getElementById('kpiCritical').textContent = stats.alerts_by_severity?.[4] || 0;
+            document.getElementById('kpiHigh').textContent = stats.alerts_by_severity?.[3] || 0;
+            document.getElementById('kpiFailed').textContent = stats.events_by_type?.failed_login || 0;
+            document.getElementById('kpiEventsSub').textContent = `Hostname: ${sys.hostname || '-'}`;
+
+            if (sys.uptime_seconds) {
+                const h = Math.floor(sys.uptime_seconds / 3600);
+                const m = Math.floor((sys.uptime_seconds % 3600) / 60);
+                document.getElementById('sidebarUptime').textContent = `Uptime: ${h}ω ${m}λ`;
+            }
+
+            // Events chart
+            const hours = Object.keys(stats.events_per_hour || {}).sort();
+            const values = hours.map(h => stats.events_per_hour[h]);
+            const labels = hours.map(h => h + ':00');
+
+            if (eventsChart) {
+                eventsChart.data.labels = labels;
+                eventsChart.data.datasets[0].data = values;
+                eventsChart.update('none');
+            } else {
+                eventsChart = new Chart(document.getElementById('eventsChart'), {
+                    type: 'line',
+                    data: {
+                        labels,
+                        datasets: [{
+                            data: values,
+                            borderColor: '#06b6d4',
+                            backgroundColor: 'rgba(6,182,212,0.08)',
+                            fill: true,
+                            tension: 0.35,
+                            pointRadius: 3,
+                            pointBackgroundColor: '#06b6d4'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 11 } } },
+                            y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 11 } }, beginAtZero: true }
+                        }
+                    }
+                });
+            }
+
+            // Type chart
+            const types = Object.keys(stats.events_by_type || {}).slice(0, 6);
+            const typeValues = types.map(t => stats.events_by_type[t]);
+            const colors = ['#ef4444', '#f97316', '#eab308', '#06b6d4', '#10b981', '#8b5cf6'];
+
+            if (typeChart) {
+                typeChart.data.labels = types;
+                typeChart.data.datasets[0].data = typeValues;
+                typeChart.update('none');
+            } else {
+                typeChart = new Chart(document.getElementById('typeChart'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: types,
+                        datasets: [{ data: typeValues, backgroundColor: colors, borderWidth: 0 }]
+                    },
+                    options: {
+                        responsive: true,
+                        cutout: '65%',
+                        plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 11 }, padding: 12 } } }
+                    }
+                });
+            }
+
+            // Top IPs
+            const ips = stats.top_source_ips || [];
+            const ipEl = document.getElementById('topIpsTable');
+            if (ips.length === 0) {
+                ipEl.innerHTML = '<div class="empty-state"><div class="icon">🌐</div>Δεν υπάρχουν IP διευθύνσεις ακόμα</div>';
+            } else {
+                ipEl.innerHTML = `<table><thead><tr><th>IP</th><th>Συμβάντα</th></tr></thead><tbody>${
+                    ips.map(([ip, cnt]) => `<tr><td style="font-family:'JetBrains Mono',monospace;color:var(--accent)">${ip}</td><td>${cnt}</td></tr>`).join('')
+                }</tbody></table>`;
+            }
+        }
+
+        function renderAlerts() {
+            let filtered = allAlerts;
+            if (alertFilter === 'unack') filtered = filtered.filter(a => !a.acknowledged);
+            else if (alertFilter === 'critical') filtered = filtered.filter(a => a.severity === 4);
+            else if (alertFilter === 'high') filtered = filtered.filter(a => a.severity === 3);
+
+            const el = document.getElementById('alertsTable');
+            if (filtered.length === 0) {
+                el.innerHTML = '<div class="empty-state"><div class="icon">✅</div>Δεν υπάρχουν ειδοποιήσεις — το σύστημα είναι καθαρό</div>';
+                return;
+            }
+
+            el.innerHTML = `<table><thead><tr>
+                <th>Ώρα</th><th>Τύπος</th><th>Severity</th><th>Host</th><th>IP</th><th>Περιγραφή</th><th>Ενέργειες</th>
+            </tr></thead><tbody>${filtered.map(a => {
+                const sc = SEVERITY_CLASS[a.severity];
+                const sn = SEVERITY[a.severity];
+                return `<tr>
+                    <td>${formatTime(a.timestamp)}</td>
+                    <td>${a.threat_type.replace(/_/g, ' ')}</td>
+                    <td><span class="badge badge-${sc}">${sn}</span></td>
+                    <td>${a.hostname}</td>
+                    <td style="font-family:'JetBrains Mono',monospace;font-size:12px">${a.source_ip || '-'}</td>
+                    <td>${truncate(a.description, 60)}</td>
+                    <td>
+                        <button class="btn btn-ghost" onclick='showAlert(${JSON.stringify(a).replace(/'/g, "&#39;")})'>Λεπτομέρειες</button>
+                        ${a.acknowledged ? '<span style="color:var(--success)">✓ ACK</span>' : `<button class="btn" onclick="ackAlert(${a.id})">ACK</button>`}
+                    </td>
+                </tr>`;
+            }).join('')}</tbody></table>`;
+        }
+
+        function renderEvents(events) {
+            const el = document.getElementById('eventsTable');
+            if (events.length === 0) {
+                el.innerHTML = '<div class="empty-state"><div class="icon">📋</div>Δεν υπάρχουν συμβάντα ακόμα. Εκκινήστε τον collector.</div>';
+                return;
+            }
+
+            el.innerHTML = `<table><thead><tr>
+                <th>Ώρα</th><th>Πηγή</th><th>Τύπος</th><th>Host</th><th>Χρήστης</th><th>IP</th><th>Μήνυμα</th>
+            </tr></thead><tbody>${events.map(e => `<tr>
+                <td>${formatTime(e.timestamp)}</td>
+                <td><span class="badge badge-low">${e.source}</span></td>
+                <td>${e.event_type}</td>
+                <td>${e.hostname}</td>
+                <td>${e.username || '-'}</td>
+                <td style="font-family:'JetBrains Mono',monospace;font-size:12px">${e.source_ip || '-'}</td>
+                <td>${truncate(e.message, 70)}</td>
+            </tr>`).join('')}</tbody></table>`;
+        }
+
+        function renderSystem(sys) {
+            document.getElementById('sysInfo').innerHTML = `
+                <div class="sys-item"><span class="sys-label">Platform</span><span class="sys-value">${sys.platform || '-'}</span></div>
+                <div class="sys-item"><span class="sys-label">Hostname</span><span class="sys-value">${sys.hostname || '-'}</span></div>
+                <div class="sys-item"><span class="sys-label">Uptime</span><span class="sys-value">${formatUptime(sys.uptime_seconds)}</span></div>
+                <div class="sys-item"><span class="sys-label">Database</span><span class="sys-value">${sys.database_type || '-'}</span></div>
+                <div class="sys-item"><span class="sys-label">Poll Interval</span><span class="sys-value">${sys.poll_interval || '-'}s</span></div>
+                <div class="sys-item"><span class="sys-label">Batch Size</span><span class="sys-value">${sys.batch_size || '-'}</span></div>
+                <div class="sys-item"><span class="sys-label">Συμβάντα (DB)</span><span class="sys-value">${(sys.total_events || 0).toLocaleString('el-GR')}</span></div>
+                <div class="sys-item"><span class="sys-label">Alerts (DB)</span><span class="sys-value">${sys.total_alerts || 0}</span></div>
+            `;
+
+            const channels = sys.collector_channels || [];
+            const errors = sys.collector_errors || [];
+            document.getElementById('collectorInfo').innerHTML = `
+                <div class="sys-item"><span class="sys-label">Collector</span><span class="sys-value">${sys.collector_type || 'N/A'}</span></div>
+                <div class="sys-item"><span class="sys-label">Κατάσταση</span><span class="sys-value" style="color:${sys.collector_active ? 'var(--success)' : 'var(--danger)'}">${sys.collector_active ? 'Ενεργός' : 'Ανενεργός'}</span></div>
+                ${errors.length ? `<div style="margin-top:12px;padding:10px;background:rgba(239,68,68,0.1);border-radius:8px;font-size:12px;color:var(--danger)">⚠ ${errors[errors.length-1]}</div>` : ''}
+                <div class="channel-list">${channels.map(ch => {
+                    const hasErr = errors.some(e => e.includes(ch));
+                    return `<span class="channel-tag ${hasErr ? 'err' : 'ok'}">${ch}</span>`;
+                }).join('')}</div>
+            `;
+
+            const notif = sys.notifications || {};
+            document.getElementById('notifInfo').innerHTML = `
+                <div class="sys-item"><span class="sys-label">Discord</span><span class="sys-value" style="color:${notif.discord ? 'var(--success)' : 'var(--text-muted)'}">${notif.discord ? 'Ενεργό' : 'Ανενεργό'}</span></div>
+                <div class="sys-item"><span class="sys-label">Telegram</span><span class="sys-value" style="color:${notif.telegram ? 'var(--success)' : 'var(--text-muted)'}">${notif.telegram ? 'Ενεργό' : 'Ανενεργό'}</span></div>
+                <div class="sys-item"><span class="sys-label">Email</span><span class="sys-value" style="color:${notif.email ? 'var(--success)' : 'var(--text-muted)'}">${notif.email ? 'Ενεργό' : 'Ανενεργό'}</span></div>
+            `;
+        }
+
+        function formatUptime(sec) {
+            if (!sec) return '-';
+            const h = Math.floor(sec / 3600);
+            const m = Math.floor((sec % 3600) / 60);
+            const s = sec % 60;
+            return `${h}ω ${m}λ ${s}δ`;
+        }
+
+        function populateEventTypes(types) {
+            const sel = document.getElementById('eventTypeFilter');
+            const current = sel.value;
+            const keys = Object.keys(types);
+            sel.innerHTML = '<option value="">Όλοι οι τύποι</option>' +
+                keys.map(k => `<option value="${k}">${k} (${types[k]})</option>`).join('');
+            sel.value = current;
+        }
+
+        function showAlert(alert) {
+            document.getElementById('modalContent').innerHTML = `
+                <div class="modal-field"><strong>Τύπος</strong>${alert.threat_type.replace(/_/g, ' ')}</div>
+                <div class="modal-field"><strong>Severity</strong><span class="badge badge-${SEVERITY_CLASS[alert.severity]}">${SEVERITY[alert.severity]}</span></div>
+                <div class="modal-field"><strong>Hostname</strong>${alert.hostname}</div>
+                <div class="modal-field"><strong>Source IP</strong>${alert.source_ip || 'N/A'}</div>
+                <div class="modal-field"><strong>Target User</strong>${alert.target_user || 'N/A'}</div>
+                <div class="modal-field"><strong>Event Count</strong>${alert.event_count}</div>
+                <div class="modal-field"><strong>Περιγραφή</strong>${alert.description}</div>
+                <div class="modal-field"><strong>Ώρα</strong>${formatTime(alert.timestamp)}</div>
+            `;
+            document.getElementById('alertModal').classList.add('open');
+        }
+
+        function closeModal() {
+            document.getElementById('alertModal').classList.remove('open');
+        }
+
+        async function ackAlert(id) {
+            try {
+                await fetch('/api/alerts/acknowledge', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ alert_id: id })
+                });
+                toast('Η ειδοποίηση αναγνωρίστηκε επιτυχώς');
+                fetchAll();
+            } catch (e) {
+                toast('Σφάλμα κατά την αναγνώριση');
+            }
+        }
+
+        document.getElementById('alertModal').addEventListener('click', e => {
+            if (e.target.id === 'alertModal') closeModal();
+        });
+
+        fetchAll();
+        setInterval(fetchAll, 30000);
+    </script>
+</body>
+</html>

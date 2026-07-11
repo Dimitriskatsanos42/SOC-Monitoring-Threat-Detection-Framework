@@ -1,0 +1,170 @@
+2026-06-12 02:33:31,533 - __main__ - INFO - Windows Event Log collector initialized
+2026-06-12 02:33:31,533 - __main__ - INFO - Starting SOC Monitor...
+2026-06-12 02:33:31,534 - __main__ - INFO - Collection thread started
+2026-06-12 02:33:31,535 - __main__ - INFO - Starting API server on 0.0.0.0:8080
+2026-06-12 02:33:31,537 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:33:34,461 - __main__ - INFO - Processed 2 events, generated 0 alerts
+2026-06-12 02:33:44,462 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:33:56,616 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:34:09,174 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:35:03,818 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:35:16,213 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:35:28,525 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:35:40,668 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:35:53,894 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:36:06,030 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:36:18,156 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:36:30,237 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:36:42,280 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:36:54,453 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:37:12,250 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:37:24,298 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:37:37,497 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:37:50,422 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:38:02,571 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:38:14,783 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:38:27,041 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:38:39,036 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:38:51,119 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:39:03,838 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:39:15,863 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:39:28,118 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:39:40,435 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:39:52,923 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:40:05,162 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:40:17,838 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:40:30,257 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:40:42,536 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:40:54,818 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:41:06,879 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:41:19,016 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:41:31,419 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-12 02:41:43,767 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-19 18:43:18,714 - __main__ - INFO - Windows Event Log collector initialized
+2026-06-19 18:43:18,720 - __main__ - INFO - Starting SOC Monitor...
+2026-06-19 18:43:18,722 - __main__ - INFO - Collection thread started
+2026-06-19 18:43:18,723 - __main__ - INFO - Starting API server on 0.0.0.0:8080
+2026-06-19 18:43:18,747 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-19 18:43:27,665 - __main__ - INFO - Processed 2 events, generated 0 alerts
+2026-06-19 18:43:37,669 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-19 18:43:42,601 - __main__ - INFO - Processed 1 events, generated 0 alerts
+2026-06-19 18:43:52,603 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-19 18:44:08,193 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-19 18:44:24,433 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-19 18:44:38,651 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-19 18:44:52,205 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-19 18:45:05,822 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-19 18:45:21,602 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-19 18:45:41,845 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-19 18:45:57,042 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-19 18:46:12,644 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-19 18:46:26,206 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-19 18:46:40,062 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-19 18:46:53,577 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-19 18:47:07,011 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-19 18:47:21,185 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-19 18:47:34,678 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-19 18:47:48,101 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-19 18:48:01,662 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-19 18:48:16,550 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-19 18:48:30,015 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-19 18:48:42,948 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-19 18:48:59,585 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-06-19 18:49:04,453 - __main__ - INFO - Shutdown signal received
+2026-06-19 18:49:04,453 - __main__ - INFO - Stopping SOC Monitor...
+2026-06-19 18:49:04,453 - __main__ - ERROR - Fatal error: asyncio.run() cannot be called from a running event loop
+Traceback (most recent call last):
+  File "C:\Users\usr1\Documents\SOC Monitoring & Threat Detection Framework\main.py", line 206, in main
+    monitor.start()
+  File "C:\Users\usr1\Documents\SOC Monitoring & Threat Detection Framework\main.py", line 178, in start
+    uvicorn.run(
+  File "C:\Users\usr1\AppData\Local\Programs\Python\Python311\Lib\site-packages\uvicorn\main.py", line 620, in run
+    server.run()
+  File "C:\Users\usr1\AppData\Local\Programs\Python\Python311\Lib\site-packages\uvicorn\server.py", line 75, in run
+    return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\usr1\AppData\Local\Programs\Python\Python311\Lib\site-packages\uvicorn\_compat.py", line 30, in asyncio_run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\usr1\AppData\Local\Programs\Python\Python311\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\usr1\AppData\Local\Programs\Python\Python311\Lib\asyncio\base_events.py", line 653, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\usr1\AppData\Local\Programs\Python\Python311\Lib\site-packages\uvicorn\server.py", line 78, in serve
+    with self.capture_signals():
+  File "C:\Users\usr1\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 144, in __exit__
+    next(self.gen)
+  File "C:\Users\usr1\AppData\Local\Programs\Python\Python311\Lib\site-packages\uvicorn\server.py", line 339, in capture_signals
+    signal.raise_signal(captured_signal)
+  File "C:\Users\usr1\Documents\SOC Monitoring & Threat Detection Framework\main.py", line 199, in signal_handler
+    monitor.stop()
+  File "C:\Users\usr1\Documents\SOC Monitoring & Threat Detection Framework\main.py", line 189, in stop
+    asyncio.run(self.notifier.close())
+  File "C:\Users\usr1\AppData\Local\Programs\Python\Python311\Lib\asyncio\runners.py", line 186, in run
+    raise RuntimeError(
+RuntimeError: asyncio.run() cannot be called from a running event loop
+2026-06-19 18:49:04,470 - __main__ - INFO - Stopping SOC Monitor...
+2026-07-11 18:40:24,302 - __main__ - INFO - Windows Event Log collector initialized
+2026-07-11 18:40:24,309 - __main__ - INFO - Starting SOC Monitor...
+2026-07-11 18:40:24,313 - __main__ - INFO - Collection thread started
+2026-07-11 18:40:24,314 - __main__ - INFO - Starting API server on 0.0.0.0:8080
+2026-07-11 18:40:24,336 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:40:43,167 - __main__ - INFO - Processed 2 events, generated 0 alerts
+2026-07-11 18:40:53,188 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:41:10,935 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:41:23,412 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:41:35,453 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:41:48,317 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:42:00,530 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:42:12,445 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:42:24,503 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:42:36,476 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:42:48,428 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:43:00,337 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:43:12,193 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:43:24,074 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:43:36,338 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:43:49,385 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:44:01,407 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:44:13,865 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:44:15,900 - __main__ - INFO - Processed 1 events, generated 0 alerts
+2026-07-11 18:44:25,901 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:44:38,225 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:44:50,323 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:44:52,383 - __main__ - INFO - Processed 1 events, generated 0 alerts
+2026-07-11 18:45:02,385 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:45:14,630 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:45:26,714 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:45:38,839 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:45:51,065 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:46:03,149 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:46:15,310 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:46:28,028 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:46:40,086 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:46:52,179 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:47:04,131 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:47:16,039 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:47:28,331 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:47:40,646 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:47:53,158 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:48:05,323 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:48:17,302 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:48:29,226 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:48:41,246 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:48:54,895 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:49:06,964 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:49:19,445 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:49:31,507 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:49:43,866 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:49:55,947 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:50:07,848 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:50:20,167 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:50:36,034 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:50:38,297 - __main__ - INFO - Processed 1 events, generated 0 alerts
+2026-07-11 18:50:48,298 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:51:00,985 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:51:13,723 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:51:25,824 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+2026-07-11 18:51:37,865 - collectors.windows_collector - ERROR - Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
