@@ -7,6 +7,8 @@ from dataclasses import dataclass
 from enum import Enum
 import threading
 
+from metrics import SOC_DATABASE_ERRORS_TOTAL
+
 try:
     import psycopg2
     from psycopg2.extras import RealDictCursor
@@ -86,7 +88,16 @@ class Database:
                     check_same_thread=False
                 )
                 self._local.connection.row_factory = sqlite3.Row
-            yield self._local.connection
+            try:
+                yield self._local.connection
+            except Exception:
+                SOC_DATABASE_ERRORS_TOTAL.inc()
+                raise
+            finally:
+                try:
+                    self._local.connection.close()
+                finally:
+                    self._local.connection = None
         else:
             if not POSTGRES_AVAILABLE:
                 raise ImportError("psycopg2 required for PostgreSQL support")
@@ -100,8 +111,23 @@ class Database:
             )
             try:
                 yield conn
+            except Exception:
+                SOC_DATABASE_ERRORS_TOTAL.inc()
+                raise
             finally:
                 conn.close()
+
+    def close(self):
+        """Close any open SQLite connection held by this thread."""
+        if hasattr(self._local, 'connection') and self._local.connection is not None:
+            self._local.connection.close()
+            self._local.connection = None
+
+    def __del__(self):
+        try:
+            self.close()
+        except Exception:
+            pass
     
     def _init_schema(self):
         """Initialize database schema."""
@@ -132,6 +158,8 @@ class Database:
             description TEXT,
             event_count INTEGER DEFAULT 1,
             acknowledged BOOLEAN DEFAULT FALSE,
+            mitre_technique VARCHAR(128),
+            assigned_analyst VARCHAR(255),
             related_event_ids TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
@@ -162,6 +190,24 @@ class Database:
                 if statement.strip():
                     cursor.execute(statement)
             conn.commit()
+        self._migrate_schema()
+
+    def _migrate_schema(self):
+        """Apply lightweight schema migrations for existing databases."""
+        if self.db_type != "sqlite":
+            return
+        migrations = [
+            "ALTER TABLE threat_alerts ADD COLUMN mitre_technique VARCHAR(128)",
+            "ALTER TABLE threat_alerts ADD COLUMN assigned_analyst VARCHAR(255)",
+        ]
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            for sql in migrations:
+                try:
+                    cursor.execute(sql)
+                except sqlite3.OperationalError:
+                    pass
+            conn.commit()
     
     def insert_event(self, event: LogEvent) -> Optional[int]:
         """Insert a log event, returns ID or None if duplicate."""
@@ -186,8 +232,8 @@ class Database:
         sql = """
         INSERT INTO threat_alerts 
         (timestamp, threat_type, severity, source_ip, target_user,
-         hostname, description, event_count, related_event_ids)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+         hostname, description, event_count, mitre_technique, assigned_analyst, related_event_ids)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
         related_ids = ','.join(map(str, alert.related_event_ids or []))
         with self.get_connection() as conn:
@@ -195,10 +241,53 @@ class Database:
             cursor.execute(sql, (
                 alert.timestamp, alert.threat_type.value, alert.severity.value,
                 alert.source_ip, alert.target_user, alert.hostname,
-                alert.description, alert.event_count, related_ids
+                alert.description, alert.event_count, getattr(alert, 'mitre_technique', None), getattr(alert, 'assigned_analyst', None), related_ids
             ))
             conn.commit()
             return cursor.lastrowid
+
+    def count_alerts(self, filters: dict = None) -> int:
+        """Return total count of alerts matching optional filters."""
+        sql = "SELECT COUNT(*) as n FROM threat_alerts"
+        clauses = []
+        params = []
+        if filters:
+            if 'severity' in filters:
+                clauses.append('severity = ?')
+                params.append(filters['severity'])
+            if 'acknowledged' in filters:
+                clauses.append('acknowledged = ?')
+                params.append(int(bool(filters['acknowledged'])))
+        if clauses:
+            sql += ' WHERE ' + ' AND '.join(clauses)
+
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(sql, tuple(params))
+            return cursor.fetchone()['n']
+
+    def get_alerts(self, limit: int = 100, offset: int = 0, filters: dict = None, unacknowledged_only: bool = False) -> List[Dict]:
+        """Get threat alerts with pagination and optional filters."""
+        sql = "SELECT * FROM threat_alerts"
+        clauses = []
+        params = []
+        if unacknowledged_only:
+            clauses.append('acknowledged = FALSE')
+        if filters:
+            if 'severity' in filters:
+                clauses.append('severity = ?')
+                params.append(filters['severity'])
+            if 'acknowledged' in filters:
+                clauses.append('acknowledged = ?')
+                params.append(int(bool(filters['acknowledged'])))
+        if clauses:
+            sql += ' WHERE ' + ' AND '.join(clauses)
+        sql += ' ORDER BY timestamp DESC LIMIT ? OFFSET ?'
+
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(sql, tuple(params) + (limit, offset))
+            return [dict(row) for row in cursor.fetchall()]
     
     def get_recent_events_by_ip(
         self, 
@@ -300,22 +389,6 @@ class Database:
                 'events_per_hour': events_per_hour,
                 'recent_alerts': recent_alerts
             }
-    
-    def get_alerts(
-        self, 
-        limit: int = 100, 
-        unacknowledged_only: bool = False
-    ) -> List[Dict]:
-        """Get threat alerts."""
-        sql = "SELECT * FROM threat_alerts"
-        if unacknowledged_only:
-            sql += " WHERE acknowledged = FALSE"
-        sql += " ORDER BY timestamp DESC LIMIT ?"
-        
-        with self.get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute(sql, (limit,))
-            return [dict(row) for row in cursor.fetchall()]
     
     def acknowledge_alert(self, alert_id: int) -> bool:
         """Mark an alert as acknowledged."""

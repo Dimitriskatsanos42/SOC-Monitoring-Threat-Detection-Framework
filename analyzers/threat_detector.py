@@ -17,6 +17,8 @@ class DetectionRule:
     threat_type: ThreatType
     severity: Severity
     description_template: str
+    id: int = None
+    mitre_technique: Optional[str] = None
     
     def format_description(self, **kwargs) -> str:
         return self.description_template.format(**kwargs)
@@ -74,6 +76,45 @@ class ThreatDetector:
         # In-memory tracking for real-time detection
         self._failed_logins: Dict[str, List[datetime]] = defaultdict(list)
         self._connection_attempts: Dict[str, List[datetime]] = defaultdict(list)
+
+        self.rules = [
+            DetectionRule(
+                id=1, name='Brute Force Attack',
+                threat_type=ThreatType.BRUTE_FORCE, severity=Severity.HIGH,
+                description_template='Detects repeated failed login attempts from a single source IP inside a defined window.',
+                mitre_technique='T1110'
+            ),
+            DetectionRule(
+                id=2, name='Failed Login Burst',
+                threat_type=ThreatType.FAILED_LOGIN, severity=Severity.MEDIUM,
+                description_template='Detects multiple failed authentication attempts for one user account.',
+                mitre_technique='T1078'
+            ),
+            DetectionRule(
+                id=3, name='Privilege Escalation Attempt',
+                threat_type=ThreatType.PRIVILEGE_ESCALATION, severity=Severity.MEDIUM,
+                description_template='Detects suspicious privilege escalation activity or failed sudo/su operations.',
+                mitre_technique='T1548'
+            ),
+            DetectionRule(
+                id=4, name='Suspicious Process Execution',
+                threat_type=ThreatType.SUSPICIOUS_PROCESS, severity=Severity.CRITICAL,
+                description_template='Detects known offensive tooling and suspicious process execution patterns.',
+                mitre_technique='T1059'
+            ),
+            DetectionRule(
+                id=5, name='Port Scan Detection',
+                threat_type=ThreatType.PORT_SCAN, severity=Severity.MEDIUM,
+                description_template='Detects potential port scanning behavior from a single source IP.',
+                mitre_technique='T1046'
+            ),
+            DetectionRule(
+                id=6, name='Audit Log Tampering',
+                threat_type=ThreatType.ANOMALY, severity=Severity.CRITICAL,
+                description_template='Detects audit log clearance or tampering events.',
+                mitre_technique='T1070.001'
+            )
+        ]
     
     def analyze_event(self, event: LogEvent) -> Optional[ThreatAlert]:
         """Analyze a single event for threats."""
@@ -310,3 +351,41 @@ class ThreatDetector:
             'top_source_ips': stats['top_source_ips'],
             'recent_alerts': stats['recent_alerts'][:10]
         }
+
+    # --- Rule management helpers for UI ---
+    def list_rules(self) -> List[Dict[str, Any]]:
+        return [
+            {
+                'id': r.id,
+                'name': r.name,
+                'threat_type': r.threat_type.value,
+                'severity': r.severity.name,
+                'description': r.description_template,
+                'mitre_technique': r.mitre_technique
+            }
+            for r in self.rules
+        ]
+
+    def update_rule_metadata(self, rule_id: int, payload: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        for r in self.rules:
+            if r.id == rule_id:
+                if 'name' in payload:
+                    r.name = payload['name']
+                if 'severity' in payload:
+                    try:
+                        r.severity = Severity[payload['severity'].upper()]
+                    except Exception:
+                        pass
+                if 'description' in payload:
+                    r.description_template = payload['description']
+                if 'mitre_technique' in payload:
+                    r.mitre_technique = payload['mitre_technique']
+                return {
+                    'id': r.id,
+                    'name': r.name,
+                    'threat_type': r.threat_type.value,
+                    'severity': r.severity.name,
+                    'description': r.description_template,
+                    'mitre_technique': r.mitre_technique
+                }
+        return None

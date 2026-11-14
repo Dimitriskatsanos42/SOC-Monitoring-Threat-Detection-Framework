@@ -8,6 +8,7 @@ from datetime import datetime
 from typing import Optional
 import threading
 import time
+import os
 
 import uvicorn
 
@@ -16,6 +17,14 @@ from storage.database import Database, LogEvent
 from analyzers.threat_detector import ThreatDetector
 from alerts.notifier import AlertNotifier
 from api import routes
+from metrics import (
+    SOC_ALERTS_GENERATED_TOTAL,
+    SOC_COLLECTOR_ERRORS_TOTAL,
+    SOC_COLLECTOR_UP,
+    SOC_EVENTS_PROCESSED_TOTAL,
+    SOC_EVENT_PROCESSING_DURATION_SECONDS,
+    SOC_DETECTION_RULE_MATCHES_TOTAL,
+)
 
 # Configure logging
 logging.basicConfig(
@@ -27,6 +36,21 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger(__name__)
+
+
+def _find_available_port(start_port: int, host: str = "0.0.0.0") -> int:
+    """Find an available TCP port starting from start_port."""
+    port = start_port
+    while True:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            try:
+                sock.bind((host, port))
+                return port
+            except OSError:
+                port += 1
+                if port > start_port + 50:
+                    raise RuntimeError("Could not find an available port")
 
 
 def _print_startup_banner(config: Config):
@@ -119,11 +143,12 @@ class SOCMonitor:
             collector_type = "Linux Syslog"
             channels = self.config.collector.linux_log_paths
 
+        collector_active = self.collector is not None
         routes.system_state = {
             "started_at": self.started_at,
             "database_type": self.config.database.type,
             "collector_type": collector_type,
-            "collector_active": self.collector is not None,
+            "collector_active": collector_active,
             "collector_channels": channels,
             "collector_errors": (
                 getattr(self.collector, "errors", []) + self.collector_errors
@@ -133,58 +158,73 @@ class SOCMonitor:
             "api_host": self.config.api_host,
             "api_port": self.config.api_port,
         }
+        if collector_type:
+            SOC_COLLECTOR_UP.labels(collector=collector_type).set(1 if collector_active else 0)
     
     def collect_and_analyze(self):
         """Main collection and analysis loop."""
         if not self.collector:
             logger.warning("No collector available, skipping collection")
             return
-        
+
         try:
             events_processed = 0
             alerts_generated = 0
-            
+
             for event in self.collector.collect_events(
                 max_events=self.config.collector.batch_size
             ):
-                # Convert to LogEvent
+                start_time = time.perf_counter()
                 log_event = self._convert_event(event)
-                
-                # Store in database
                 event_id = self.db.insert_event(log_event)
-                
+
                 if event_id:
                     log_event.id = event_id
                     events_processed += 1
-                    
-                    # Analyze for threats
+                    SOC_EVENTS_PROCESSED_TOTAL.labels(
+                        source=log_event.source,
+                        event_type=log_event.event_type,
+                    ).inc()
+                    SOC_EVENT_PROCESSING_DURATION_SECONDS.labels(
+                        source=log_event.source,
+                    ).observe(time.perf_counter() - start_time)
+
                     alert = self.detector.analyze_event(log_event)
-                    
                     if alert:
-                        # Store alert
                         alert_id = self.db.insert_alert(alert)
                         alert.id = alert_id
                         alerts_generated += 1
-                        
+                        SOC_ALERTS_GENERATED_TOTAL.labels(
+                            threat_type=alert.threat_type.value,
+                            severity=alert.severity.name,
+                        ).inc()
+                        SOC_DETECTION_RULE_MATCHES_TOTAL.labels(
+                            rule_name=alert.threat_type.value,
+                            threat_type=alert.threat_type.value,
+                        ).inc()
+
                         logger.warning(
                             f"ALERT: {alert.threat_type.value} - "
                             f"{alert.severity.name} - {alert.description}"
                         )
-                        
-                        # Send notifications asynchronously
+
                         asyncio.run(self.notifier.send_alert(alert))
-            
+
             if events_processed > 0:
                 logger.info(
                     f"Processed {events_processed} events, "
                     f"generated {alerts_generated} alerts"
                 )
-            
+
             self._update_system_state()
-        
+
         except Exception as e:
             logger.error(f"Error in collection cycle: {e}", exc_info=True)
             self.collector_errors.append(str(e))
+            if self.collector is not None:
+                SOC_COLLECTOR_ERRORS_TOTAL.labels(
+                    collector=self.config.collector.linux_log_paths[0] if platform.system() != "Windows" else "Windows Event Log"
+                ).inc()
             self._update_system_state()
     
     def _convert_event(self, event) -> LogEvent:
@@ -231,7 +271,6 @@ class SOCMonitor:
     def start(self):
         """Start the SOC Monitor."""
         logger.info("Starting SOC Monitor...")
-        _print_startup_banner(self.config)
         self.running = True
         
         # Start collection thread
@@ -243,6 +282,18 @@ class SOCMonitor:
         logger.info("Collection thread started")
         
         # Start API server
+        port = self.config.api_port
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+                sock.bind((self.config.api_host, port))
+        except OSError:
+            port = _find_available_port(port, self.config.api_host)
+            logger.warning(f"Port {self.config.api_port} is busy, using {port} instead")
+            self.config.api_port = port
+
+        self._update_system_state()
+        _print_startup_banner(self.config)
+
         logger.info(f"Starting API server on {self.config.api_host}:{self.config.api_port}")
         uvicorn.run(
             routes.app,

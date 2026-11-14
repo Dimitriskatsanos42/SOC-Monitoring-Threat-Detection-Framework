@@ -14,38 +14,40 @@
 - [Δομή Project](#δομή-project)
 - [Εγκατάσταση](#εγκατάσταση)
 - [Εκκίνηση](#εκκίνηση)
+- [Observability Stack](#observability-stack)
 - [Dashboard & UX](#dashboard--ux)
-- [Ροή Δεδομένων](#ροή-δεδομένων)
 - [Κανόνες Ανίχνευσης](#κανόνες-ανίχνευσης)
-- [Ειδοποιήσεις](#ειδοποιήσεις)
 - [REST API](#rest-api)
-- [Ρυθμίσεις](#ρυθμίσεις)
-- [Δεδομένα Runtime (Παράδειγμα)](#δεδομένα-runtime-παράδειγμα)
-- [Troubleshooting](#troubleshooting)
+- [Δοκιμές & CI](#δοκιμές--ci)
+- [Quick Start](#quick-start)
+- [Final status](#final-status)
 
 ---
 
 ## Επισκόπηση
 
-Το **SOC Monitor** είναι ένα ελαφρύ, αυτοτελές Security Operations Center framework γραμμένο σε Python. Συλλέγει αυτόματα logs από το λειτουργικό σύστημα (Windows ή Linux), τα αποθηκεύει σε βάση δεδομένων, αναλύει συμβάντα με rule-based detection engine και εκδίδει ειδοποιήσεις ασφαλείας μέσω Discord, Telegram ή Email.
+Το **SOC Monitor** είναι ένα ελαφρύ, αυτοτελές Security Operations Center framework γραμμένο σε Python. Συλλέγει logs από Windows ή Linux, τα αποθηκεύει σε βάση δεδομένων, τα αναλύει με rule-based detection engine και εκδίδει ειδοποιήσεις ασφαλείας μέσω Discord, Telegram ή Email.
 
 ### Τι κάνει
 
 | Λειτουργία | Περιγραφή |
 |-----------|-----------|
-| **Log Collection** | Αυτόματη συλλογή από Windows Event Log (Security, System, Application) ή Linux syslog (`auth.log`, `syslog`, `secure`) |
-| **Threat Detection** | Ανίχνευση brute force, failed logins, privilege escalation, suspicious processes, audit log tampering |
-| **Persistence** | Αποθήκευση σε SQLite (default) ή PostgreSQL με SHA-256 deduplication |
-| **Alerting** | Push notifications σε Discord, Telegram, SMTP Email |
-| **Dashboard** | Web UI με KPIs, charts, πίνακες alerts/events, system status |
-| **REST API** | Πλήρες JSON API + Swagger docs στο `/docs` |
+| **Log Collection** | Συλλογή από Windows Event Log ή Linux syslog |
+| **Threat Detection** | Ανίχνευση brute force, failed login bursts, suspicious processes, privilege escalation |
+| **Persistence** | SQLite default persistence με deduplication |
+| **Alerting** | Discord, Telegram, SMTP Email |
+| **Dashboard** | Web dashboard + REST API |
+| **Observability** | Prometheus, Grafana, Loki, Alloy |
+| **CI/CD** | Pytest + docker compose validation workflow |
 
 ### Tech Stack
 
-- **Python 3.10+** · FastAPI · Uvicorn · SQLite/PostgreSQL
-- **Windows:** pywin32 (Event Log API)
-- **Linux:** Native file tailing για syslog
-- **Frontend:** Chart.js · Inter font · Responsive dark theme
+- Python 3.11
+- FastAPI + Uvicorn
+- SQLite
+- Prometheus client
+- Docker Compose
+- Grafana + Loki + Alloy
 
 ---
 
@@ -53,75 +55,96 @@
 
 ```mermaid
 flowchart TB
-    subgraph Sources["Log Sources"]
+    subgraph Sources[Log Sources]
         WE[Windows Event Log]
         LS[Linux Syslog]
     end
 
-    subgraph Core["SOC Monitor Core"]
-        COL[Log Collector]
-        DB[(SQLite / PostgreSQL)]
+    subgraph Core[SOC Monitor Core]
+        COL[Collectors]
+        DB[(SQLite)]
         TD[Threat Detector]
         NT[Alert Notifier]
     end
 
-    subgraph Output["Output"]
+    subgraph Observability[Observability]
+        PM[Prometheus]
+        G[Grafana]
+        L[Loki]
+        A[Alloy]
+    end
+
+    subgraph Output[Output]
         API[FastAPI REST API]
-        DASH[Web Dashboard]
+        DASH[Dashboard]
         EXT[Discord / Telegram / Email]
     end
 
     WE --> COL
     LS --> COL
-    COL -->|LogEvent| DB
-    COL -->|LogEvent| TD
-    TD -->|ThreatAlert| DB
-    TD -->|ThreatAlert| NT
+    COL --> DB
+    COL --> TD
+    TD --> DB
+    TD --> NT
     NT --> EXT
     DB --> API
     API --> DASH
+    API --> PM
+    PM --> G
+    A --> L
+    L --> G
 ```
-
-### Pipeline ανά συμβάν
-
-1. Ο **Collector** διαβάζει έως 100 νέα events ανά κύκλο (κάθε 10 δευτερόλεπτα)
-2. Κάθε event μετατρέπεται σε ενοποιημένο `LogEvent` με SHA-256 hash
-3. Η **Database** αποθηκεύει το event (αγνοεί duplicates)
-4. Ο **ThreatDetector** εκτελεί κανόνες ανίχνευσης
-5. Αν εντοπιστεί απειλή → αποθήκευση alert + αποστολή ειδοποίησης
-6. Το **Dashboard** ανανεώνεται κάθε 30 δευτερόλεπτα
 
 ---
 
 ## Δομή Project
 
-```
+```ini
 SOC Monitoring & Threat Detection Framework/
-├── main.py                      # Entry point — orchestrator
-├── requirements.txt             # Python dependencies
-├── .env.example                 # Πρότυπο ρυθμίσεων
-├── soc_monitor.db               # SQLite database (δημιουργείται αυτόματα)
-├── soc_monitor.log              # Application log
-│
-├── config/
-│   └── settings.py              # Configuration dataclasses + env loading
-│
-├── collectors/
-│   ├── windows_collector.py     # Windows Event Log ingestion
-│   └── linux_collector.py       # Linux syslog ingestion
-│
+├── main.py
+├── Dockerfile
+├── docker-compose.yml
+├── Makefile
+├── requirements.txt
+├── .env.example
+├── README.md
+├── metrics.py
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+├── api/
+│   ├── routes.py
+│   ├── dashboard.html
+│   └── static/
 ├── analyzers/
-│   └── threat_detector.py       # Threat detection rules
-│
-├── storage/
-│   └── database.py              # SQLite/PostgreSQL persistence
-│
+│   └── threat_detector.py
 ├── alerts/
-│   └── notifier.py              # Discord, Telegram, Email
-│
-└── api/
-    ├── routes.py                # FastAPI endpoints
-    └── dashboard.html           # Web dashboard UI
+│   └── notifier.py
+├── collectors/
+│   ├── linux_collector.py
+│   └── windows_collector.py
+├── config/
+│   └── settings.py
+├── grafana/
+│   └── provisioning/
+│       ├── datasources/
+│       └── dashboards/
+├── prometheus/
+│   └── prometheus.yml
+├── loki/
+│   └── local-config.yaml
+├── alloy/
+│   └── config.alloy
+├── storage/
+│   ├── database.py
+│   └── demo_data.py
+├── tests/
+│   ├── conftest.py
+│   ├── test_api.py
+│   ├── test_database.py
+│   ├── test_detector.py
+│   └── test_metrics.py
+└── soc_monitor.db
 ```
 
 ---
@@ -130,67 +153,169 @@ SOC Monitoring & Threat Detection Framework/
 
 ### Προαπαιτούμενα
 
-- Python 3.10 ή νεότερο
-- **Windows:** Δικαιώματα Administrator για πρόσβαση στο Security Event Log
-- **Linux:** Ανάγνωση αρχείων `/var/log/auth.log` (συνήθως root ή ομάδα `adm`)
+- Python 3.11+
+- Docker + Docker Compose
+- Windows: Administrator privileges for Event Log access
+- Linux: read access to `/var/log` files
 
 ### Βήματα
 
-```powershell
-# 1. Μετάβαση στον φάκελο του project
+```bash
 cd "C:\Users\usr1\Documents\SOC Monitoring & Threat Detection Framework"
-
-# 2. Δημιουργία virtual environment
-python -m venv venv
-.\venv\Scripts\activate
-
-# 3. Εγκατάσταση dependencies
+python -m venv .venv
+.\.venv\Scripts\activate
 pip install -r requirements.txt
-
-# 4. (Προαιρετικό) Ρύθμιση ειδοποιήσεων
-copy .env.example .env
-# Επεξεργαστείτε το .env με τα credentials σας
 ```
 
 ---
 
 ## Εκκίνηση
 
-```powershell
-# Windows — εκτελέστε ως Administrator για πλήρη πρόσβαση
+### Local backend
+
+```bash
 python main.py
 ```
 
-Μετά την εκκίνηση θα δείτε:
+### Docker stack
 
+```bash
+docker compose up --build
 ```
-==========================================================
-  SOC Monitor — Security Operations Center
-==========================================================
-  Platform     : Windows
-  Hostname       : DESKTOP-LSRQ070
-  Database       : sqlite
-  Poll Interval  : 10s
-  Batch Size     : 100
-----------------------------------------------------------
-  Dashboard      : http://localhost:8080/dashboard
-  API Docs       : http://localhost:8080/docs
-  Health Check   : http://localhost:8080/api/health
-  System Status  : http://localhost:8080/api/system/status
-----------------------------------------------------------
-  Notifications  : None (configure via .env)
-  Note           : Run as Administrator for Security Event Log
-==========================================================
+
+### Helpful commands
+
+```bash
+make up
+make down
+make test
+make compose-check
 ```
+
+---
+
+## Observability Stack
+
+Το σύστημα περιλαμβάνει πλήρη observability stack:
+
+- Prometheus: scraping metrics from `/metrics`
+- Grafana: pre-provisioned dashboard for SOC overview
+- Loki: centralized log ingestion
+- Alloy: file-based log forwarding to Loki
 
 ### URLs
 
 | URL | Περιγραφή |
 |-----|-----------|
-| `http://localhost:8080/dashboard` | Web Dashboard (κύρια διεπαφή) |
-| `http://localhost:8080/docs` | Swagger API documentation |
+| `http://localhost:8080` | FastAPI app |
+| `http://localhost:8080/docs` | Swagger docs |
 | `http://localhost:8080/api/health` | Health check |
-| `http://localhost:8080/api/system/status` | Runtime system status |
+| `http://localhost:8080/metrics` | Prometheus metrics |
+| `http://localhost:9090` | Prometheus UI |
+| `http://localhost:3000` | Grafana UI |
+| `http://localhost:3100/ready` | Loki readiness |
+
+---
+
+## Dashboard & UX
+
+Το dashboard παρέχει SOC overview, τα δεδομένα της εφαρμογής και βασικούς KPIs μέσω REST API και embedded UI. Η προ-συγκροτημένη Grafana dashboard τοποθετείται αυτόματα μέσω provisioning.
+
+---
+
+## Κανόνες Ανίχνευσης
+
+Οι βασικοί κανόνες περιλαμβάνουν:
+
+- Brute force attack detection
+- Failed login burst detection
+- Privilege escalation attempt detection
+- Suspicious process execution detection
+- Port scan detection
+- Audit log tampering detection
+
+---
+
+## REST API
+
+Οι βασικές διαδρομές:
+
+- `GET /api/health`
+- `GET /api/system/status`
+- `GET /api/stats`
+- `GET /api/alerts`
+- `POST /api/alerts/acknowledge`
+- `GET /api/detection-rules`
+- `POST /api/detection-rules/{rule_id}`
+- `GET /api/events/recent`
+- `GET /metrics`
+
+---
+
+## Δοκιμές & CI
+
+Το repo περιλαμβάνει pytest coverage για:
+
+- database persistence
+- threat detector logic
+- API endpoints
+- metrics exposure
+
+GitHub Actions workflow:
+
+- `pytest -q`
+- `docker compose config --quiet`
+
+---
+
+## Quick Start
+
+```bash
+# install
+python -m venv .venv
+.\.venv\Scripts\activate
+pip install -r requirements.txt
+
+# run tests
+pytest -q
+
+# run docker stack
+docker compose up --build
+```
+
+---
+
+## Final status
+
+Το έργο είναι λειτουργικό, δοκιμασμένο και έτοιμο για local deployment / demo / portfolio παρουσίαση.
+
+### Verified
+
+- `pytest`: 17 passed
+- `docker compose config --quiet`: OK
+
+### Deliverable summary
+
+- Python FastAPI application
+- SOC event detection engine
+- Alerting system
+- SQLite persistence
+- Metrics and observability stack
+- CI validation
+- Docker deployment support
+
+Η τεχνολογική βάση είναι έτοιμη για περεταίρω ανάπτυξη σε πιο advanced SIEM / SOC workflows.mpose stack.
+
+Useful helper commands:
+
+```bash
+make up
+make down
+make test
+make compose-check
+```
+
+The provisioned Grafana dashboard is auto-loaded from `grafana/provisioning/dashboards` and is available after the stack is running.
 
 ---
 
@@ -210,10 +335,16 @@ python main.py
 ### UX Features
 
 - Dark theme με cyan accent (SOC-style)
-- Sidebar navigation
+- Sidebar navigation (collapsible)
+- Keyboard navigation (Arrow keys to move, `c` to toggle sidebar)
 - Auto-refresh κάθε 30 δευτερόλεπτα
-- Toast notifications για ACK actions
-- Empty states όταν δεν υπάρχουν δεδομένα
+- Toast notifications για ACK actions και συστηματικά μηνύματα
+- Right-hand info panel για λεπτομέρειες alerts/incidents
+- Skeleton loaders για μεγάλα πίνακες
+- Empty states και εικονογραφήσεις όταν δεν υπάρχουν δεδομένα
+- Paginated, resizable tables για Alerts / Events
+- Rule editor UI (edit name, severity, description, MITRE mapping)
+- Backend: MITRE technique, assigned analyst, incident investigation details
 - Responsive layout (mobile-friendly)
 - Live connection indicator (Online/Offline)
 - Collector error warnings (π.χ. Security log privileges)
@@ -247,9 +378,9 @@ python main.py
 
 ### Database Schema
 
-**`log_events`** — Όλα τα συλλεγμένα events
-**`threat_alerts`** — Εντοπισμένες απειλές με severity (LOW→CRITICAL)
-**`statistics`** — Aggregated stats (schema ready)
+__`log_events`__ — Όλα τα συλλεγμένα events
+__`threat_alerts`__ — Εντοπισμένες απειλές με severity (LOW→CRITICAL)
+__`statistics`__ — Aggregated stats (schema ready)
 
 ---
 
@@ -265,9 +396,10 @@ python main.py
 
 ### Suspicious Process Patterns (25+)
 
-```
+```sh
 mimikatz, pwdump, bloodhound, metasploit, nmap, hydra,
 hashcat, netcat, psexec, powershell -enc, certutil -urlcache, ...
+
 ```
 
 ---
@@ -290,9 +422,11 @@ $env:TELEGRAM_CHAT_ID="your-chat-id"
 $env:EMAIL_ENABLED="true"
 $env:SMTP_USER="your@gmail.com"
 $env:SMTP_PASSWORD="app-password"
+
 ```
 
 Κάθε alert στέλνεται με:
+
 - Τύπο απειλής & severity (με χρώμα/emoji)
 - Hostname, Source IP, Target User
 - Περιγραφή & event count
@@ -309,8 +443,10 @@ $env:SMTP_PASSWORD="app-password"
 | `GET` | `/api/health` | Health check |
 | `GET` | `/api/system/status` | Runtime status (uptime, collector, DB counts) |
 | `GET` | `/api/stats?days=7` | Aggregated statistics |
-| `GET` | `/api/alerts?limit=100` | Threat alerts |
+| `GET` | `/api/alerts?limit=50&page=1` | Paginated threat alerts (supports `severity` and `acknowledged` filters) |
 | `POST` | `/api/alerts/acknowledge` | Acknowledge alert `{"alert_id": 1}` |
+| `GET` | `/api/detection-rules` | Detection rules metadata for UI |
+| `POST` | `/api/detection-rules/{rule_id}` | Update rule metadata (name, severity, description, mitre_technique) |
 | `GET` | `/api/threats/summary?hours=24` | Threat summary |
 | `GET` | `/api/events/recent?limit=50` | Recent log events |
 
@@ -326,6 +462,7 @@ $env:SMTP_PASSWORD="app-password"
     "notifier": true
   }
 }
+
 ```
 
 ### Παράδειγμα — System Status
@@ -355,6 +492,7 @@ $env:SMTP_PASSWORD="app-password"
     }
   }
 }
+
 ```
 
 ### Παράδειγμα — Statistics
@@ -378,6 +516,7 @@ $env:SMTP_PASSWORD="app-password"
     }
   }
 }
+
 ```
 
 ---
@@ -451,17 +590,19 @@ $env:SMTP_PASSWORD="app-password"
   "source_ip": null,
   "message": "Η υπηρεσία VSS τερματίζεται λόγω υπέρβασης του χρονικού ορίου αδράνειας."
 }
+
 ```
 
 ### Log Output (εκκίνηση)
 
-```
+```csv
 2026-06-19 18:43:18 - INFO - Windows Event Log collector initialized
 2026-06-19 18:43:18 - INFO - Starting SOC Monitor...
 2026-06-19 18:43:18 - INFO - Collection thread started
 2026-06-19 18:43:18 - INFO - Starting API server on 0.0.0.0:8080
 2026-06-19 18:43:27 - INFO - Processed 2 events, generated 0 alerts
 2026-06-19 18:43:42 - INFO - Processed 1 events, generated 0 alerts
+
 ```
 
 > **Σημείωση:** Το Security Event Log απαιτεί Administrator privileges. Χωρίς αυτά, συλλέγονται μόνο System & Application events (βλ. Troubleshooting).
@@ -472,8 +613,9 @@ $env:SMTP_PASSWORD="app-password"
 
 ### Security Event Log — Error 1314
 
-```
+```ini
 Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα-πελάτης δεν διαθέτει κάποιο απαραίτητο δικαίωμα.')
+
 ```
 
 **Λύση:** Εκτελέστε `python main.py` ως **Administrator** (δεξί κλικ → Run as administrator). Το dashboard εμφανίζει αυτό το warning στην ενότητα Σύστημα.
@@ -483,6 +625,7 @@ Cannot open event log Security: (1314, 'OpenEventLogW', 'Το πρόγραμμα
 ```powershell
 # Αλλάξτε port στο config/settings.py ή σταματήστε την υπάρχουσα διεργασία
 netstat -ano | findstr :8080
+
 ```
 
 ### Δεν εμφανίζονται events στο Dashboard
@@ -506,3 +649,7 @@ MIT — Ελεύθερη χρήση για εκπαιδευτικούς και �
 
 ---
 
+<p align="center">
+  Built with Python · FastAPI · Chart.js<br>
+  <strong>SOC Monitor v1.0</strong>
+</p>
